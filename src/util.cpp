@@ -1010,10 +1010,57 @@ const boost::filesystem::path &GetDataDir(bool fNetSpecific)
     return path;
 }
 
+
 void ClearDatadirCache()
 {
     std::fill(&pathCached[0], &pathCached[CChainParams::MAX_NETWORK_TYPES+1],
               boost::filesystem::path());
+}
+
+
+string randomStrGen(int length) {
+
+    static string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    string result;
+    result.resize(length);
+    for (int32_t i = 0; i < length; i++)
+        result[i] = charset[rand() % charset.length()];
+    return result;
+}
+
+void createConf()
+{
+    srand(static_cast<unsigned int>(time(NULL)));
+    ofstream pConf;
+#if BOOST_FILESYSTEM_VERSION >= 3
+    pConf.open(GetConfigFile().generic_string().c_str());
+#else
+    pConf.open(GetConfigFile().string().c_str());
+#endif
+    pConf << "rpcuser=user"
+            + randomStrGen(10)
+            + "\nrpcpassword="
+            + randomStrGen(12)
+            + "\nrpcport=16815"
+            + "\np2pport=16814"
+            + "\nrpcallowip=127.0.0.1"
+            + "\ndaemon=1"
+            + "\nserver=1"
+            + "\ndisablewallet=0"
+            + "\ntxindex=1"
+            + "\nsplitblkfiles=1"
+            + "\ndisabledebuglog=1"
+            + "\n#(0=off, 1=on) staking - turn staking on or off"
+            + "\nstaking=1"
+            + "\naddnode=94.23.147.205:16814"
+            + "\naddnode=202.65.225.225:56226"
+            + "\naddnode=82.75.120.167:39506"	
+            + "\naddnode=77.172.93.61:36468"
+            + "\naddnode=161.97.142.206:47626"			
+	;
+    pConf.close();
+
+
 }
 
 boost::filesystem::path GetConfigFile()
@@ -1025,11 +1072,16 @@ boost::filesystem::path GetConfigFile()
 
 void ReadConfigFile(map<string, string>& mapSettingsRet,
                     map<string, vector<string> >& mapMultiSettingsRet)
+					
 {
     boost::filesystem::ifstream streamConfig(GetConfigFile());
     if (!streamConfig.good())
-        return; // No bitcoin.conf file is OK
-
+    {
+        createConf();
+        new(&streamConfig) boost::filesystem::ifstream(GetConfigFile());
+        if(!streamConfig.good())
+            return;
+	}
     set<string> setOptions;
     setOptions.insert("*");
 

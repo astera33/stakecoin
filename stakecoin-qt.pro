@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = stakecoin-qt
-VERSION = 1.1.0.0
+VERSION = 1.1.0.1
 INCLUDEPATH += src src/json src/qt
 QT += network
 DEFINES += ENABLE_WALLET
@@ -13,7 +13,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0
 }
 
-# for boost 1.37, add -mt to the boost libraries
+# for boost 1.47, add -mt to the boost libraries
 # use: qmake BOOST_LIB_SUFFIX=-mt
 # for boost thread win32 with _win32 sufix
 # use: BOOST_THREAD_LIB_SUFFIX=_win32-...
